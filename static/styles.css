@@ -1,0 +1,48 @@
+/* Tipografía moderna y base visual neutra */
+:root { --bg: #f6f7fb; --card: #ffffff; --text: #111827; --muted: #6b7280; --border: #e5e7eb; --shadow: 0 10px 30px rgba(17, 24, 39, 0.08); --radius: 16px; --pad: 22px; }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; background: radial-gradient(1200px 600px at 20% 0%, #eef2ff 0%, transparent 60%), radial-gradient(900px 500px at 90% 10%, #f1f5f9 0%, transparent 55%), var(--bg); color: var(--text); line-height: 1.45; }
+
+/* Contenedor tipo "card" centrado para que el form se vea profesional */
+body > * { max-width: 720px; }
+h1 { font-size: 28px; letter-spacing: -0.02em; margin: 0 0 14px; }
+hr { border: none; height: 1px; background: var(--border); margin: 16px 0; }
+
+/* Estilo del bloque principal: aplica si tu contenido está dentro del body */
+body { display: grid; place-items: center; padding: 28px 16px; }
+body > h1, body > form, body > p, body > a, body > hr, body > picture, body > div { width: 100%; }
+body::before { content: ""; position: fixed; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(255,255,255,0.25), transparent 45%); }
+
+/* "Card" automática para formularios y resultados: hace que todo se agrupe visualmente */
+form { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--pad); box-shadow: var(--shadow); }
+p { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin: 10px 0; box-shadow: 0 6px 18px rgba(17, 24, 39, 0.05); }
+
+/* Etiquetas e inputs: más aire y mejor jerarquía visual */
+label { display: inline-block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+input { width: 100%; border: 1px solid var(--border); border-radius: 12px; padding: 12px 12px; font-size: 15px; color: var(--text); background: #fff; outline: none; transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease; }
+input::placeholder { color: #9ca3af; }
+input:focus { border-color: #a5b4fc; box-shadow: 0 0 0 4px rgba(165, 180, 252, 0.35); }
+input:active { transform: translateY(0.5px); }
+
+/* Botones: modernos, con hover y foco accesible */
+button { appearance: none; border: 1px solid rgba(99, 102, 241, 0.35); background: linear-gradient(180deg, rgba(99, 102, 241, 0.95), rgba(79, 70, 229, 0.95)); color: #fff; border-radius: 12px; padding: 12px 14px; font-weight: 600; font-size: 14px; cursor: pointer; transition: transform 120ms ease, filter 120ms ease, box-shadow 120ms ease; box-shadow: 0 10px 22px rgba(79, 70, 229, 0.20); }
+button:hover { filter: brightness(1.03); transform: translateY(-1px); }
+button:active { transform: translateY(0px); }
+button:focus { outline: none; box-shadow: 0 0 0 4px rgba(165, 180, 252, 0.45), 0 10px 22px rgba(79, 70, 229, 0.20); }
+
+/* Links: más estéticos, tipo acción secundaria */
+a { display: inline-block; margin-top: 10px; text-decoration: none; color: #4f46e5; font-weight: 600; padding: 8px 10px; border-radius: 10px; border: 1px solid transparent; transition: background 120ms ease, border-color 120ms ease; }
+a:hover { background: rgba(79, 70, 229, 0.08); border-color: rgba(79, 70, 229, 0.18); }
+
+/* Mensajes (OK/Error): si usas <strong>OK:</strong> o <strong>Error:</strong> en tus <p> */
+p strong { display: inline-block; margin-right: 6px; }
+p:has(strong) { position: relative; }
+p:has(strong:contains("OK")) { border-left: 5px solid rgba(16, 185, 129, 0.75); }
+p:has(strong:contains("Error")) { border-left: 5px solid rgba(239, 68, 68, 0.75); }
+
+/* Imagen del emoji: centrada y con un poquito de aire */
+picture { display: block; margin-top: 12px; }
+img { display: block; margin: 0 auto; filter: drop-shadow(0 10px 20px rgba(17, 24, 39, 0.10)); }
+
+/* Responsive: reduce tamaños en pantallas pequeñas */
+@media (max-width: 520px) { h1 { font-size: 22px; } form { padding: 18px; } }

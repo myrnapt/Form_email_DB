@@ -1,0 +1,123 @@
+En Windows Subsystem for Linux (WSL) las órdenes que indicas son conceptualmente correctas, pero la sintaxis cambia porque WSL usa un entorno Linux. Las rutas y scripts de activación no son los de Windows. La secuencia equivalente sería esta.
+
+Primero, crear el entorno virtual dentro de la carpeta del proyecto. En Linux se usa normalmente python3:
+
+python3 -m venv .venv
+
+
+Después, activar el entorno virtual. En WSL el script de activación está en bin, no en Scripts:
+
+source .venv/bin/activate
+
+
+Cuando está activado, el prompt mostrará (.venv) al inicio.
+
+A continuación, instalar Flask dentro del entorno virtual:
+
+python -m pip install flask
+
+
+En muchos sistemas también funciona:
+
+pip install flask
+
+
+Luego, ejecutar la aplicación con Flask:
+
+python -m flask --app hello.py run
+
+
+o
+
+flask --app hello.py run
+
+
+Si quieres modo depuración con recarga automática:
+
+flask --app hello.py run --debug
+
+
+Finalmente, si la aplicación usa MySQL, instalar el conector:
+
+python -m pip install mysql-connector-python
+
+Vale. Si XAMPP no te funciona, lo correcto en WSL es montar MySQL/MariaDB dentro de Linux y conectar Flask a ese servicio. Te explico paso a paso: instalar MySQL, crear BD+tabla, meter datos, y qué estructura usar en Flask para las URLs `getmail` y `addmail`. Al final tienes comandos exactos y cómo “rellenarla”.
+
+1. Instalar MySQL dentro de WSL (Ubuntu/Debian)
+
+1) Actualiza paquetes: `sudo apt update`
+2) Instala servidor MySQL: `sudo apt install -y mysql-server`
+3) Arranca el servicio: `sudo service mysql start`
+4) Comprueba estado: `sudo service mysql status`
+
+Si te dice “active (running)”, ya está.
+
+2. Asegurar acceso y crear usuario para tu app
+
+1) Entra al cliente MySQL como root (en Ubuntu suele ir por auth_socket): `sudo mysql`
+2) Crea base de datos: `CREATE DATABASE alumnes CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`
+3) Crea usuario (ejemplo como en tu script): `CREATE USER 'myrna'@'localhost' IDENTIFIED BY 'proven';`
+4) Da permisos: `GRANT ALL PRIVILEGES ON alumnes.* TO 'myrna'@'localhost';`
+5) Aplica permisos: `FLUSH PRIVILEGES;`
+6) Sal: `EXIT;`
+
+Con esto ya puedes conectar desde Python con host localhost, user myrna, pass proven, database alumnes (como tu ejemplo).
+
+3. Crear tabla “contactes” y rellenarla
+
+1) Entra con el usuario nuevo: `mysql -u myrna -p`
+
+2) Selecciona la BD: `USE alumnes;`
+
+3) Crea tabla (nombre único y email):
+   `CREATE TABLE contactes (id INT AUTO_INCREMENT PRIMARY KEY, nom VARCHAR(80) NOT NULL UNIQUE, email VARCHAR(255) NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB;`
+
+4) Inserta datos de prueba:
+   `INSERT INTO contactes (nom, email) VALUES ('anna','anna@gmail.com'),('joan','joan@hotmail.com'),('pere','pere@yahoo.es');`
+
+5) Comprueba: `SELECT * FROM contactes;`
+
+Eso ya es “rellenarla”.
+
+4. Cómo usar esa BD en tu Flask (concepto para tu proyecto)
+
+Tu app tendrá 2 URLs con formulario + resultado:
+
+* `/getmail` (GET muestra formulario, POST busca y muestra resultado/error en la misma plantilla o en una segunda)
+* `/addmail` (GET muestra formulario, POST inserta y confirma/da error si existe)
+
+Aquí lo importante es que en Flask uses el mismo patrón que ya has usado: `request.form[...]` y `cursor.execute(...)` con `%s`.
+
+La conexión en Flask: usa `mysql.connector` (igual que en tu script), pero abriendo/cerrando conexión por request (no dejar conexión global abierta).
+
+5. Estructura mínima del proyecto
+
+* `app.py`
+* `templates/getmail.html`
+* `templates/addmail.html`
+* `static/styles.css` (opcional)
+
+6. Comandos rápidos para operar MySQL desde WSL
+
+* Arrancar MySQL: `sudo service mysql start`
+* Entrar como root: `sudo mysql`
+* Entrar como usuario: `mysql -u myrna -p`
+* Ver bases de datos: `SHOW DATABASES;`
+* Ver tablas: `SHOW TABLES;`
+
+
+CREATE DATABASE alumnes CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE alumnes;
+CREATE TABLE contactes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nom VARCHAR(80) NOT NULL UNIQUE,
+  email VARCHAR(255) NOT NULL
+);
+CREATE USER 'myrna'@'localhost' IDENTIFIED BY 'proven';
+GRANT ALL PRIVILEGES ON alumnes.* TO 'myrna'@'localhost';
+FLUSH PRIVILEGES;
+INSERT INTO contactes (nom,email) VALUES ('anna','anna@gmail.com');
+
+source .venv/bin/activate
+pip install flask mysql-connector-python
+python3 app.py

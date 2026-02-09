@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="/static/styles.css" rel="stylesheet">
+  <title>Get Mail</title>
+</head>
+<body>
+
+  <!-- Título de la página -->
+  <h1>Buscar email</h1>
+
+  <!-- Formulario: al no tener action, envía a la misma URL (/getmail) -->
+  <!-- method="post" hace que Flask entre en la rama POST y procese la búsqueda -->
+  <form method="post">
+    <label for="nombre">Nom:</label><br>
+    <!-- name="nombre" es la clave que leerá Flask: request.form["nombre"] -->
+    <input id="nombre" type="text" name="nombre" required value="{{ nombre }}"><br><br>
+    <button type="submit">Buscar</button>
+  </form>
+
+  <hr>
+
+  <!-- Zona de resultados: solo aparece si hay email -->
+  {% if email %}
+    <p><strong>Email:</strong> {{ email }}</p>
+  {% endif %}
+
+  <!-- Zona de error: solo aparece si error_msg tiene contenido -->
+  {% if error_msg %}
+    <p><strong>Error:</strong> {{ error_msg }}</p>
+  {% endif %}
+
+  <hr>
+
+  <!-- Enlace obligatorio a addmail -->
+  <a href="{{ url_for('addmail') }}">Anar a AddMail</a>
+
+</body>
+</html>
