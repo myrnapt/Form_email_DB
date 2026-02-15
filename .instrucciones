@@ -101,3 +101,5 @@ INSERT INTO contactes (nom,email) VALUES ('anna','anna@gmail.com');
 source .venv/bin/activate
 pip install flask mysql-connector-python
 python3 app.py
+
+mysqldump -u usuario -p nombre_basedatos > backup.sql
