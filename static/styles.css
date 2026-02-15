@@ -1,4 +1,4 @@
-/* Tipografía moderna y base visual neutra */
+/* ESTE CSS HA SIDO GENERADO POR IA (OBVIAMENTE)*/
 :root { --bg: #f6f7fb; --card: #ffffff; --text: #111827; --muted: #6b7280; --border: #e5e7eb; --shadow: 0 10px 30px rgba(17, 24, 39, 0.08); --radius: 16px; --pad: 22px; }
 * { box-sizing: border-box; }
 body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; background: radial-gradient(1200px 600px at 20% 0%, #eef2ff 0%, transparent 60%), radial-gradient(900px 500px at 90% 10%, #f1f5f9 0%, transparent 55%), var(--bg); color: var(--text); line-height: 1.45; }

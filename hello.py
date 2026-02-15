@@ -1,136 +1,61 @@
 from flask import Flask, request, render_template
-# Importamos el conector de MySQL para conectar desde Python
 import mysql.connector
-# Importamos errores de MySQL para capturar fallos 
-from mysql.connector import Error, errorcode
 
-# Creamos la aplicación Flask (esto es obligatorio)
 app = Flask(__name__)
 
-# Función reutilizable: crea y devuelve una conexión nueva a MySQL
-# Se usa en cada request para evitar dejar conexiones abiertas globalmente
-def get_db_connection():
+#Función para conectarDB a la BD
+def conectarDB():
     return mysql.connector.connect(
-        host="localhost",      # MySQL corre dentro de WSL en localhost
-        user="myrna",          # Usuario creado en MySQL
-        password="proven",     # Password del usuario
-        database="alumnes"     # Base de datos
+        host="localhost",
+        user="myrna",
+        password="proven",
+        database="alumnes"
     )
 
-# Ruta 1: GETMAIL
-# - GET: muestra el formulario para pedir nombre
-# - POST: recibe el nombre, consulta la BD y muestra el email o error
 @app.route("/getmail", methods=["GET", "POST"])
 def getmail():
-    # Variables que pasaremos a la plantilla; por defecto no hay resultado
-    email = None
-    error_msg = None
-    nombre = ""
+    email = None #que se muestre el formulario inicialmente vacío
+    error = None #mensaje si hay un error
 
-    # Si el usuario ha enviado el formulario, llega un POST
     if request.method == "POST":
-        # Leemos el campo del formulario HTML: <input name="nombre">
-        nombre = request.form["nombre"].strip()
+        nombre = request.form["nombre"] #obtener el nombre del formulario
+        conn = conectarDB() #guarda el resultado que produce la función en la var
+        cursor = conn.cursor() #guardamos el metodo cursor para ejecutar consultas SQL
+        cursor.execute(f"SELECT email FROM contactes WHERE nom = '{nombre}'")
+        resultado = cursor.fetchone() #devuelve la primera fila del resultado de la consulta o None si no hay resultados
 
-        try:
-            # Abrimos conexión a MySQL
-            conn = get_db_connection()
-            # Creamos cursor para ejecutar SQL
-            cursor = conn.cursor()
+        #mensaje de error si no existe el nombre
+        if resultado:
+            email = resultado[0]
+        else:
+            error = "Nom no trobat"
 
-            # Ejecutamos consulta parametrizada (evita inyección SQL)
-            cursor.execute("SELECT email FROM contactes WHERE nom = %s", (nombre,))
-            result = cursor.fetchone()  # Devuelve una fila (tuple) o None
+        cursor.close()
+        conn.close()
 
-            # Si no hay resultados, mostramos error
-            if result is None:
-                error_msg = "No existeix aquest nom a la BD"
-            else:
-                # result[0] contiene el email (única columna seleccionada)
-                email = result[0]
+    return render_template("getmail.html", email=email, error=error) #devueve el html con las variables resultantes
 
-        except Error as err:
-            # Errores típicos si MySQL está apagado o credenciales incorrectas
-            if err.errno == errorcode.CR_CONNECTION_ERROR:
-                error_msg = "No es pot connectar: MySQL està apagat o no accessible"
-            else:
-                error_msg = f"Error MySQL: {err}"
-
-        finally:
-            # Cerramos recursos si llegaron a abrirse
-            try:
-                if cursor:
-                    cursor.close()
-            except:
-                pass
-            try:
-                if conn and conn.is_connected():
-                    conn.close()
-            except:
-                pass
-
-    # Renderizamos la plantilla (muestra formulario y, si corresponde, resultado/error)
-    return render_template("getmail.html", nombre=nombre, email=email, error_msg=error_msg)
-
-
-# Ruta 2: ADDMAIL
-# - GET: muestra formulario para añadir nombre+email
-# - POST: inserta en BD; confirma o error si ya existe
 @app.route("/addmail", methods=["GET", "POST"])
 def addmail():
-    ok_msg = None
-    error_msg = None
-    nombre = ""
-    email = ""
+    mensaje = None
 
     if request.method == "POST":
-        # Leemos campos del formulario: <input name="nombre"> y <input name="email">
-        nombre = request.form["nombre"].strip()
-        email = request.form["email"].strip()
+        nombre = request.form["nombre"]
+        email = request.form["email"]
 
-        try:
-            conn = get_db_connection()
-            cursor = conn.cursor()
+        conn = conectarDB()
+        cursor = conn.cursor()
 
-            # Insert parametrizado
-            cursor.execute(
-                "INSERT INTO contactes (nom, email) VALUES (%s, %s)",
-                (nombre, email)
-            )
-            # Confirmamos cambios (sin commit no se guarda)
-            conn.commit()
+        # Agregar el nuevo contacto a la base de datos
+        cursor.execute(f"INSERT INTO contactes (nom, email) VALUES ('{nombre}', '{email}')")
+        conn.commit()
 
-            ok_msg = "Contacte afegit correctament"
+        mensaje = "Contacte afegit correctament"
 
-            # Limpieza de campos tras insertar (para que el formulario vuelva vacío)
-            nombre = ""
-            email = ""
+        cursor.close()
+        conn.close()
 
-        except mysql.connector.errors.IntegrityError:
-            # Esto pasa si 'nom' es UNIQUE y ya existe ese nombre
-            error_msg = "Aquest nom ja existeix. Tria un altre."
+    return render_template("addmail.html", mensaje=mensaje)
 
-        except Error as err:
-            if err.errno == errorcode.CR_CONNECTION_ERROR:
-                error_msg = "No es pot connectar: MySQL està apagat o no accessible"
-            else:
-                error_msg = f"Error MySQL: {err}"
-
-        finally:
-            try:
-                if cursor:
-                    cursor.close()
-            except:
-                pass
-            try:
-                if conn and conn.is_connected():
-                    conn.close()
-            except:
-                pass
-
-    return render_template("addmail.html", nombre=nombre, email=email, ok_msg=ok_msg, error_msg=error_msg)
-
-
-# Arranque local en debug (en desarrollo)
 if __name__ == "__main__":
     app.run(debug=True)

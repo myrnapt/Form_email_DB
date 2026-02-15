@@ -7,15 +7,11 @@
   <title>Add Mail</title>
 </head>
 <body>
-
-  <!-- Título -->
   <h1>Afegir contacte</h1>
 
   <!-- Formulario para insertar en BD -->
-  <!-- method="post" dispara la inserción en Flask -->
   <form method="post">
     <label for="nombre">Nom:</label><br>
-    <!-- value="{{ nombre }}" mantiene el texto si hubo error -->
     <input id="nombre" type="text" name="nombre" required value="{{ nombre }}"><br><br>
 
     <label for="email">Email:</label><br>
@@ -24,21 +20,16 @@
     <button type="submit">Afegir</button>
   </form>
 
-  <hr>
-
-  <!-- Mensaje de OK: aparece si ok_msg tiene contenido -->
-  {% if ok_msg %}
-    <p><strong>OK:</strong> {{ ok_msg }}</p>
+  <!-- Mensaje de OK -->
+  {% if mensaje  %}
+    <p><strong>OK:</strong> {{ mensaje }}</p>
   {% endif %}
 
-  <!-- Mensaje de error: aparece si error_msg tiene contenido -->
-  {% if error_msg %}
-    <p><strong>Error:</strong> {{ error_msg }}</p>
+  <!-- Mensaje de error-->
+  {% if error %}
+    <p><strong>Error:</strong> {{ error }}</p>
   {% endif %}
 
-  <hr>
-
-  <!-- Enlace obligatorio a getmail -->
   <a href="{{ url_for('getmail') }}">Anar a GetMail</a>
 
 </body>

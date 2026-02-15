@@ -1,60 +1,40 @@
-En Windows Subsystem for Linux (WSL) las órdenes que indicas son conceptualmente correctas, pero la sintaxis cambia porque WSL usa un entorno Linux. Las rutas y scripts de activación no son los de Windows. La secuencia equivalente sería esta.
 
 Primero, crear el entorno virtual dentro de la carpeta del proyecto. En Linux se usa normalmente python3:
-
 python3 -m venv .venv
 
 
 Después, activar el entorno virtual. En WSL el script de activación está en bin, no en Scripts:
-
 source .venv/bin/activate
 
 
 Cuando está activado, el prompt mostrará (.venv) al inicio.
-
 A continuación, instalar Flask dentro del entorno virtual:
-
 python -m pip install flask
 
 
 En muchos sistemas también funciona:
-
 pip install flask
 
 
 Luego, ejecutar la aplicación con Flask:
-
-python -m flask --app hello.py run
-
-
-o
-
-flask --app hello.py run
-
-
-Si quieres modo depuración con recarga automática:
-
 flask --app hello.py run --debug
 
 
-Finalmente, si la aplicación usa MySQL, instalar el conector:
-
-python -m pip install mysql-connector-python
-
 Vale. Si XAMPP no te funciona, lo correcto en WSL es montar MySQL/MariaDB dentro de Linux y conectar Flask a ese servicio. Te explico paso a paso: instalar MySQL, crear BD+tabla, meter datos, y qué estructura usar en Flask para las URLs `getmail` y `addmail`. Al final tienes comandos exactos y cómo “rellenarla”.
 
-1. Instalar MySQL dentro de WSL (Ubuntu/Debian)
-
+1. Instalar MySQL dentro de WSL (Ubuntu/Debian) 
+python -m pip install mysql-connector-python
 1) Actualiza paquetes: `sudo apt update`
-2) Instala servidor MySQL: `sudo apt install -y mysql-server`
-3) Arranca el servicio: `sudo service mysql start`
+2) Instala servidor MySQL: `sudo apt install -y mysql-server` / sudo apt install mariadb-server
+3) Arranca el servicio: `sudo service mysql start` sudo systemctl enable mariadb
+
 4) Comprueba estado: `sudo service mysql status`
 
 Si te dice “active (running)”, ya está.
 
 2. Asegurar acceso y crear usuario para tu app
 
-1) Entra al cliente MySQL como root (en Ubuntu suele ir por auth_socket): `sudo mysql`
+1) Entra al cliente MySQL como root (en Ubuntu suele ir por auth_socket): `sudo mysql` sudo mysql -u root
 2) Crea base de datos: `CREATE DATABASE alumnes CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`
 3) Crea usuario (ejemplo como en tu script): `CREATE USER 'myrna'@'localhost' IDENTIFIED BY 'proven';`
 4) Da permisos: `GRANT ALL PRIVILEGES ON alumnes.* TO 'myrna'@'localhost';`
@@ -99,7 +79,7 @@ La conexión en Flask: usa `mysql.connector` (igual que en tu script), pero abri
 
 6. Comandos rápidos para operar MySQL desde WSL
 
-* Arrancar MySQL: `sudo service mysql start`
+* Arrancar MySQL: `sudo service mysql start` mariadb
 * Entrar como root: `sudo mysql`
 * Entrar como usuario: `mysql -u myrna -p`
 * Ver bases de datos: `SHOW DATABASES;`
