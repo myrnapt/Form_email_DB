@@ -2,4 +2,7 @@ _pycache_/
 .venv/
 *.log
 .env
-*.pyc  
+*.pyc
+*.pyo
+*.pyd
+ 
